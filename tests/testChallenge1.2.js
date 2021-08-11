@@ -24,26 +24,34 @@ describe("Challenge 1.2", function () {
     });
 
     it("Should provide DAI successful...", async function(){
-        let amountToDeposit = "400";
+        let amountToProvide = "400";
         await this.GenericERC20.attach(DAIAddress).connect(whaleSigner).approve(this.swapperUNIV2.address, ethers.utils.parseUnits("40000"));
-        await this.swapperUNIV2.connect(whaleSigner).provide(ethers.utils.parseUnits(amountToDeposit), DAIAddress);
-        let DAIbalance = ethers.utils.formatUnits(await this.swapperUNIV2.connect(whaleSigner).viewBalance(DAIAddress));
-        expect(Number(DAIbalance)).equal(Number(amountToDeposit));
+        await this.swapperUNIV2.connect(whaleSigner).provide(ethers.utils.parseUnits(amountToProvide), DAIAddress, false);
+        let PoolDAIbalance = ethers.utils.formatUnits(await this.swapperUNIV2.connect(whaleSigner).viewBalance(DAIAddress));
+        expect(Number(PoolDAIbalance)).equal(Number(amountToProvide));
     });
 
     it("Should swap DAI for ETH successful...", async function(){
-        let DAIbalanceBefore = ethers.utils.formatUnits(await this.swapperUNIV2.connect(whaleSigner).viewBalance(DAIAddress));
         let amountToSwap = "200";
+        let DAIBalanceBeforeSwap = ethers.utils.formatUnits(await this.swapperUNIV2.connect(whaleSigner).viewBalance(DAIAddress));
         await this.swapperUNIV2.connect(whaleSigner).swap(ethers.utils.parseUnits(amountToSwap), DAIAddress, WETHAddress);
-        let DAIbalancAfter = ethers.utils.formatUnits(await this.swapperUNIV2.connect(whaleSigner).viewBalance(DAIAddress));
-        expect(Number(DAIbalancAfter)).equal(Number(DAIbalanceBefore) - Number(parseFloat(amountToSwap)));
+        let DAIBalanceAfterSwap = ethers.utils.formatUnits(await this.swapperUNIV2.connect(whaleSigner).viewBalance(DAIAddress));
+        expect(Number(DAIBalanceAfterSwap)).equal(Number(DAIBalanceBeforeSwap) - Number(parseFloat(amountToSwap)));
     });
 
     it("Should withdraw ETH successful...", async function(){
         let amountToWithdraw = "0.01";
-        let before = ethers.utils.formatUnits(await this.swapperUNIV2.connect(whaleSigner).viewBalance(WETHAddress));
+        let WETHBalanceBeforeWithdraw = ethers.utils.formatUnits(await this.swapperUNIV2.connect(whaleSigner).viewBalance(WETHAddress));
         await this.swapperUNIV2.connect(whaleSigner).withdraw(ethers.utils.parseUnits(amountToWithdraw), WETHAddress);
-        let after = ethers.utils.formatUnits(await this.swapperUNIV2.connect(whaleSigner).viewBalance(WETHAddress));
-        expect(Number(after)).equal(Number(before) - Number(parseFloat(amountToWithdraw)));
+        let WETHBalanceAfterWithdraw = ethers.utils.formatUnits(await this.swapperUNIV2.connect(whaleSigner).viewBalance(WETHAddress));
+        expect(Number(WETHBalanceAfterWithdraw)).equal(Number(WETHBalanceBeforeWithdraw) - Number(parseFloat(amountToWithdraw)));
+    });
+
+    it("Should provide ETH (not wrapped) succesful...", async function(){
+        let amountToProvide = "3";
+        let poolWETHBeforeBalance = ethers.utils.formatUnits(await this.swapperUNIV2.connect(whaleSigner).viewBalance(WETHAddress));
+        await this.swapperUNIV2.connect(whaleSigner).provide(0, WETHAddress, true, { value: ethers.utils.parseUnits(amountToProvide)});
+        let poolWETHAfterBalance = ethers.utils.formatUnits(await this.swapperUNIV2.connect(whaleSigner).viewBalance(WETHAddress));
+        expect(Number(poolWETHAfterBalance)).equal(Number(amountToProvide) + Number(poolWETHBeforeBalance));
     });
 });

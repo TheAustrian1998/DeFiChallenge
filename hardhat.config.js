@@ -10,7 +10,8 @@ module.exports = {
   networks: {
     hardhat: {
       forking: {
-        url: urlAlchemy
+        url: urlAlchemy,
+        block: 13006453
       }
     }
   }

@@ -37,4 +37,14 @@ contract Swapper is ReentrancyGuard {
         toToken.transfer(msg.sender, amount);
     }
 
+    function viewBalanceFromToken() public view returns (uint256){
+        //Show user balance "fromToken"
+        return fromTokenBalances[msg.sender];
+    }
+
+    function viewBalanceToToken() public view returns (uint256){
+        //Show user balance "toToken"
+        return toTokenBalances[msg.sender];
+    }
+
 }

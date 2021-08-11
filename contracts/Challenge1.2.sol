@@ -4,7 +4,8 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./IUniswapV2Router02.sol";
-import "hardhat/console.sol";
+import "./IWETH.sol";
+// import "hardhat/console.sol";
 
 contract SwapperUNIV2 is ReentrancyGuard {
 
@@ -18,13 +19,20 @@ contract SwapperUNIV2 is ReentrancyGuard {
         DAI = _DAI;
         WETH = _WETH;
         UniswapV2Router = IUniswapV2Router02(_UniswapV2Router);
+        //Unilimited approve
         IERC20(DAI).approve(_UniswapV2Router, type(uint).max);
         IERC20(WETH).approve(_UniswapV2Router, type(uint).max);
     }
 
-    function provide(uint256 amount, address tokenToDeposit) external {
+    function provide(uint256 amount, address tokenToDeposit, bool isNativeETH) external payable {
         //Deposit "tokenToDeposit"
-        IERC20(tokenToDeposit).transferFrom(msg.sender, address(this), amount);
+        if (isNativeETH == true) {
+            //Need to wrap some ETH
+            IWETH(WETH).deposit{ value:msg.value }();
+            amount = uint(msg.value);
+        }else{
+            IERC20(tokenToDeposit).transferFrom(msg.sender, address(this), amount);
+        }
         if (tokenToDeposit == DAI) DAIBalances[msg.sender] += amount;
         if (tokenToDeposit == WETH) WETHBalances[msg.sender] += amount;
     }
@@ -75,6 +83,7 @@ contract SwapperUNIV2 is ReentrancyGuard {
     }
 
     function viewBalance(address tokenToView) public view returns (uint256){
+        //Show user balance in contract
         uint256 balance = 0;
 
         if (tokenToView == DAI) {
