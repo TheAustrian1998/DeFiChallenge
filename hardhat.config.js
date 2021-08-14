@@ -3,6 +3,7 @@
  */
 
 require("@nomiclabs/hardhat-waffle");
+require("hardhat-gas-reporter");
 let { urlAlchemy } = require("./secrets.json");
 
 module.exports = {

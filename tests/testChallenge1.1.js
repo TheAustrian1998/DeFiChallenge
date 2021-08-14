@@ -15,9 +15,17 @@ describe("Challenge 1.1", function () {
         });
         whaleSigner = await ethers.getSigner(whaleAddress);
 
-        //Deploy
+        //Deploy library
+        this.IterableMapping = await ethers.getContractFactory("IterableMapping");
+        this.iterableMapping = await this.IterableMapping.deploy();
+
+        //Deploy contracts
         this.GenericERC20 = await ethers.getContractFactory("GenericERC20");
-        this.Swapper = await ethers.getContractFactory("Swapper");
+        this.Swapper = await ethers.getContractFactory("Swapper", {
+            libraries: {
+                IterableMapping: this.iterableMapping.address,
+            }
+        });
         this.swapper = await this.Swapper.deploy(STABLE1Address, STABLE2Address);
         await this.swapper.deployed();
 
@@ -38,14 +46,12 @@ describe("Challenge 1.1", function () {
     });
 
     it("Should swap STABLE1 for STABLE2 successful...", async function(){
-        let amountToSwap = "200";
         let balanceBeforeSwapFromToken = ethers.utils.formatUnits(await this.swapper.connect(whaleSigner).viewBalanceFromToken());
-        let balanceBeforeSwapToToken = ethers.utils.formatUnits(await this.swapper.connect(whaleSigner).viewBalanceToToken());
-        await this.swapper.connect(whaleSigner).swap(ethers.utils.parseUnits(amountToSwap));
+        await this.swapper.connect(whaleSigner).swap();
         let balanceAfterSwapFromToken = ethers.utils.formatUnits(await this.swapper.connect(whaleSigner).viewBalanceFromToken());
         let balanceAfterSwapToToken = ethers.utils.formatUnits(await this.swapper.connect(whaleSigner).viewBalanceToToken());
-        expect(Number(balanceAfterSwapFromToken)).equal(Number(balanceBeforeSwapFromToken)-Number(amountToSwap));
-        expect(Number(balanceAfterSwapToToken)).equal(Number(balanceBeforeSwapToToken)+Number(amountToSwap));
+        expect(Number(balanceAfterSwapFromToken)).equal(0);
+        expect(Number(balanceAfterSwapToToken)).equal(Number(balanceBeforeSwapFromToken));
     });
 
     it("Should withdraw STABLE2 successful...", async function(){
