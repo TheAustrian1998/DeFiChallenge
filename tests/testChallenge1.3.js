@@ -105,12 +105,12 @@ describe("Challenge 1.3", function () {
     it("Should execute work() successfully...", async function () {
 
         const keep3rContract = new ethers.Contract(keep3rAddress, Keep3rABI, ethers.provider);
-        let balanceBeforeWork = await keep3rContract.connect(keeperWhaleSigner).balanceOf(keeperWhaleSigner.address);
+        let balanceBeforeWork = ethers.utils.formatUnits(await keep3rContract.connect(randomKeeperSigner).balanceOf(randomKeeperSigner.address));
         let workable = await this.swapperJob.workable();
         if (workable) {
             await this.swapperJob.connect(randomKeeperSigner).work((Date.now() * 1000) + 900);
         }
-        let balanceAfterWork = await keep3rContract.connect(keeperWhaleSigner).balanceOf(keeperWhaleSigner.address);
+        let balanceAfterWork = ethers.utils.formatUnits(await keep3rContract.connect(randomKeeperSigner).balanceOf(randomKeeperSigner.address));
         //Check keeper received reward (1 KP3R)
         expect(Number(balanceAfterWork)).equal((Number(balanceBeforeWork) + 1));
 
