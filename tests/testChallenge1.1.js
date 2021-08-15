@@ -96,7 +96,7 @@ describe("Challenge 1.1", function () {
     it("Should withdraw STABLE2 successfully...", async function () {
 
         async function withdraw(whale, swapper, GenericERC20) {
-            let amountToWithdraw = "300";
+            let amountToWithdraw = "250";
             let balanceBeforeWithdrawSTABLE2 = ethers.utils.formatUnits(await GenericERC20.attach(STABLE2Address).connect(whale).balanceOf(whale.address));
             let balanceBeforeToToken = ethers.utils.formatUnits(await swapper.connect(whale).viewBalanceToToken());
             await swapper.connect(whale).withdraw(ethers.utils.parseUnits(amountToWithdraw));

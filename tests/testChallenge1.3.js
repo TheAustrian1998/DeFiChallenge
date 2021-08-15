@@ -84,7 +84,7 @@ describe("Challenge 1.3", function () {
 
     });
 
-    it("Should provide ETH (not wrapped) succesful...", async function () {
+    it("Should provide ETH (not wrapped) successfully...", async function () {
 
         async function provide(whale, swapperUNIV2) {
             const amounts = ["3", "4", "5", "6", "8"]; //Pick random amount
