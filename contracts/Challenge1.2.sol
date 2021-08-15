@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./IUniswapV2Router02.sol";
 import "./IWETH.sol";
 import "./IterableMap.sol";
-import "hardhat/console.sol";
 
 contract SwapperUNIV2 is ReentrancyGuard {
 
@@ -83,7 +82,7 @@ contract SwapperUNIV2 is ReentrancyGuard {
     function withdraw(uint256 amount) external nonReentrant {
         //Withdraw "DAI"
         uint256 DAIBalance = DAIBalances.get(msg.sender);
-        require(DAIBalance >= amount);
+        require(DAIBalance >= amount, "Not enough balance");
         DAIBalances.set(msg.sender, DAIBalance - amount);
         IERC20(DAI).transfer(msg.sender, amount);
     }

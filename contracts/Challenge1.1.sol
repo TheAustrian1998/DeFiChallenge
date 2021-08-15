@@ -47,7 +47,7 @@ contract Swapper is ReentrancyGuard {
 
     function withdraw(uint256 amount) external nonReentrant {
         //Withdraw "toToken"
-        require(toTokenBalances.get(msg.sender) >= amount);
+        require(toTokenBalances.get(msg.sender) >= amount, "Not enough balance");
         uint256 balance = toTokenBalances.get(msg.sender);
         toTokenBalances.set(msg.sender, balance - amount);
         toToken.transfer(msg.sender, amount);
